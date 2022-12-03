@@ -1,0 +1,1 @@
+si deux triangle très proche , supprime 1 et ajoute un nouveau triangle dans un endroid vide
