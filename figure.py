@@ -73,6 +73,12 @@ class Polygon(Figure):
     def isCircle(self):
         return False
 
+    def copy(self):
+        new_polygon = Polygon(self._img_width, self._img_height, self.nb_corner)
+        new_polygon.points = self.points.copy()
+        new_polygon.color = self.color.copy()
+        return new_polygon
+
 
 
 class Circle(Figure):
@@ -127,4 +133,10 @@ class Circle(Figure):
 
     def isCircle(self):
         return True
+
+    def copy(self) -> 'Circle':
+        new = Circle(self._img_width, self._img_height, self.nb_corner)
+        new.points = self.points.copy()
+        new.color = self.color.copy()
+        return new
 

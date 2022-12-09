@@ -6,11 +6,14 @@ from copy import deepcopy
 
 
 class Painting:
-    def __init__(self,nb_figures, target_img: Image, background_color=(0,0,0,255), nb_corner=-1, set_figures:bool = True):
+    def __init__(self,nb_figures, target_img: Image, background_color=None, nb_corner=-1, set_figures:bool = True):
         self._target_img = target_img
         self._img_width, self._img_height = target_img.size
         self._nb_figures = nb_figures
-        self._background_color = background_color if len(background_color) == 4 else background_color + (255,)
+        if background_color is None:
+            self._background_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255)
+        else:
+            self._background_color = background_color if len(background_color) == 4 else background_color + (255,)
         self.nb_corner = nb_corner
 
         if (set_figures):
@@ -25,8 +28,8 @@ class Painting:
     def copy(self):
         copy = Painting(self._nb_figures, self._target_img, self._background_color, self.nb_corner)
         copy.figures = list(self.figures)
+        copy.fiting = self.fiting
         return copy
-
 
     @property
     def get_background_color(self):
@@ -56,6 +59,7 @@ class Painting:
         draw = ImageDraw.Draw(img)
 
         if not hasattr(self, '_background_color'):
+            print('no background color')
             self._background_color = (0, 0, 0, 255)
 
         draw.polygon([(0, 0), (0, self._img_height*scale), (self._img_width*scale, self._img_height*scale), (self._img_width*scale, 0)], fill=self._background_color)
@@ -75,9 +79,10 @@ class Painting:
     def get_child(parrent_a: 'Painting', parrent_b: 'Painting'):
         if not Painting._mate_possible(parrent_a, parrent_b):
             raise Exception("Cannot mate images with different dimensions or number of triangles")
-        bg = tuple(int(a + b / 2) for a, b in zip(parrent_a.get_background_color, parrent_b.get_background_color))
-        childa = Painting(parrent_a.num_element, parrent_a._target_img, bg, parrent_a.nb_corner, set_figures=False)
-        childb = Painting(parrent_b.num_element, parrent_b._target_img, bg, parrent_b.nb_corner, set_figures=False)
+        bg = tuple(int((a + b) / 2) for a, b in zip(parrent_a.get_background_color, parrent_b.get_background_color))
+
+        childa = Painting(parrent_a.num_element, parrent_a._target_img, background_color=bg, nb_corner=parrent_a.nb_corner, set_figures=False)
+        childb = Painting(parrent_b.num_element, parrent_b._target_img, background_color=bg, nb_corner=parrent_b.nb_corner, set_figures=False)
 
 
         for i in range(parrent_a.num_element):
@@ -94,7 +99,7 @@ class Painting:
         return deepcopy(childa), deepcopy(childb)
 
 
-    def mutate_population(self, rate=0.04, swap=0.5, sigma=1.0):
+    def mutate_population(self, rate=0.04, swap=0.5, sigma=1.0, color_rate=0.1):
         total_mutations = int(rate*self.num_element)
         random_indices = list(range(self.num_element))
         random.shuffle(random_indices)
@@ -103,6 +108,16 @@ class Painting:
         for i in range(total_mutations):
             index = random_indices[i]
             self.figures[index].mutate(sigma=sigma)
+
+
+        # mutate background color
+        if random.random() < (color_rate/2):
+            self._background_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255)
+
+        elif random.random() < (color_rate/2):
+            def clamp(x):
+                return max(0, min(x, 255))
+            self._background_color = tuple(clamp(self._background_color[i] + [10, -10][random.randint(0, 1)]) for i in range(3)) + (255,)
 
 
         # Swap two triangles randomly

@@ -30,7 +30,7 @@ def print_summary(pop: 'Population', img_template="output%d.png", checkpoint_pat
     #     pop.checkpoint(target=checkpoint_path, id=pop.current_generation)
 
 class Population():
-    def __init__(self, target_img, population_size= 50, generation=0, nb_figures=100, background_color=(0,0,0,255), nb_corner=-1, rate=0.04, swap=0.5, sigma=1) -> None:
+    def __init__(self, target_img, population_size= 50, generation=0, nb_figures=100, background_color=None, nb_corner=-1, rate=0.04, swap=0.5, sigma=1, color_rate=0.1) -> None:
         self._population_size: int = population_size
         self.induviduals: list[Painting] = [Painting(nb_figures, target_img, background_color, nb_corner) for _ in range(population_size)]
         self.current_generation: int = generation
@@ -39,7 +39,9 @@ class Population():
         self.rate=rate
         self.swap=swap
         self.sigma=sigma
+        self.color_rate=color_rate
         self._target_img: Image = target_img
+
 
         self.set_current_best()
         self.set_current_worst()
@@ -79,15 +81,16 @@ class Population():
         else:
             self._current_wors = random.choice(self.induviduals)
 
-    def mutate_population(self, rate=0.04, swap=0.5, sigma=1):
+    def mutate_population(self, rate=0.04, swap=0.5, sigma=1, color_rate=0.1):
         for individual in self.induviduals:
-            individual.mutate_population(rate, swap, sigma)
+            individual.mutate_population(rate, swap, sigma, color_rate)
         print()
 
 
     def evolve(self):
         self.current_generation += 1
-        save = deepcopy(self._current_best)
+        save = self._current_best.copy()
+        # save = deepcopy(self._current_best)
         new_induviduals = []
 
 
@@ -100,13 +103,14 @@ class Population():
         new_induviduals.sort(key=lambda x: x.fiting)
         new_induviduals = new_induviduals[:self._population_size]
 
-        self.induviduals = deepcopy(new_induviduals)
+        # self.induviduals = deepcopy(new_induviduals)
+        self.induviduals = new_induviduals.copy()
 
-        self.mutate_population(rate=self.rate, swap=self.swap, sigma=self.sigma)
+        self.mutate_population(rate=self.rate, swap=self.swap, sigma=self.sigma, color_rate=self.color_rate)
 
-        new_induviduals += deepcopy(self.induviduals)
-        new_induviduals.sort(key=lambda x: x.fiting)
-        self.induviduals = deepcopy(new_induviduals[:self._population_size])
+        # new_induviduals += deepcopy(self.induviduals)
+        # new_induviduals.sort(key=lambda x: x.fiting)
+        # self.induviduals = deepcopy(new_induviduals[:self._population_size])
 
         self.set_current_worst()
 
@@ -118,10 +122,15 @@ class Population():
 
 
 
-    def evolution(self, nb_generation, img_template="output%d.png", checkpoint_path="output", rate=0.04, swap=0.5, sigma=1):
-        self.rate=rate
-        self.swap=swap
-        self.sigma=sigma
+    def evolution(self, nb_generation, img_template="output%d.png", checkpoint_path="output", rate=None, swap=None, sigma=None, color_rate=None):
+        if rate is not None:
+            self.rate=rate
+        if swap is not None:
+            self.swap=swap
+        if sigma is not None:
+            self.sigma=sigma
+        if color_rate is not None:
+            self.color_rate=color_rate
         for _ in range(nb_generation):
             self.evolve()
             print_summary(self, img_template, checkpoint_path)
