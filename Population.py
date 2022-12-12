@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw
 from copy import deepcopy
 import threading
 
-SAVE = 0
+save = 0
 
 def pick_random(pop):
     mom = random.choice(pop)
@@ -22,11 +22,14 @@ def pick_best_and_random(pop: 'Population', maximize=False):
 
 
 def print_summary(pop: 'Population', img_template="output%d.png", checkpoint_path="output") -> int:
+
+    global save
+
     avg_fitness = sum(i.fiting for i in pop.induviduals) / pop._population_size
 
-    print(f"generation {pop.current_generation}, best score {pop._current_best.fiting}, pop. avg. {avg_fitness}")
-    if (SAVE != pop._current_best.fiting):
-        SAVE = pop._current_best.fiting
+    print(f"\tBest score {pop._current_best.fiting}, pop. avg. {avg_fitness}")
+    if (save != pop._current_best.fiting):
+        save = pop._current_best.fiting
         img = pop._current_best.draw()
         img.save(img_template % pop._id_image, 'PNG')
         pop._id_image += 1
@@ -39,7 +42,11 @@ class Population():
     def __init__(self, target_img, population_size= 50, generation=0, nb_figures=100, background_color=None, nb_corner=-1, rate=0.04, swap=0.5, sigma=1, color_rate=0.1) -> None:
         self._id_image = 0
         self._population_size: int = population_size
-        self.induviduals: list[Painting] = [Painting(nb_figures, target_img, background_color, nb_corner) for _ in range(population_size)]
+        self.induviduals: list[Painting] = []
+        for _ in range(population_size):
+            self.induviduals.append(Painting(nb_figures, target_img, background_color, nb_corner))
+            print('.', end='', flush=True)
+        print()
         self.current_generation: int = generation
         self._current_best = None
         self._current_wors = None
@@ -89,6 +96,7 @@ class Population():
             self._current_wors = random.choice(self.induviduals)
 
     def mutate_population(self, rate=0.04, swap=0.5, sigma=1, color_rate=0.1):
+        print(f'\tMutating induviduals:\t\t', end='', flush=True)
         for individual in self.induviduals:
             individual.mutate_population(rate, swap, sigma, color_rate)
         print()
@@ -97,27 +105,22 @@ class Population():
     def evolve(self):
         self.current_generation += 1
         save = self._current_best.copy()
-        # save = deepcopy(self._current_best)
         new_induviduals = []
 
-
+        print(f'Generation {self.current_generation}:\n\tCreating new induviduals:\t', end='', flush=True)
         for _ in range(self._population_size):
             mom, dad = pick_best_and_random(self)
             child_a, child_b = Painting.get_child(mom, dad)
             new_induviduals.extend((child_a, child_b))
-
-        ## remove the half worst
+            print('.', end='', flush=True)
+        print()
         new_induviduals.sort(key=lambda x: x.fiting)
         new_induviduals = new_induviduals[:self._population_size]
 
-        # self.induviduals = deepcopy(new_induviduals)
         self.induviduals = new_induviduals.copy()
 
         self.mutate_population(rate=self.rate, swap=self.swap, sigma=self.sigma, color_rate=self.color_rate)
 
-        # new_induviduals += deepcopy(self.induviduals)
-        # new_induviduals.sort(key=lambda x: x.fiting)
-        # self.induviduals = deepcopy(new_induviduals[:self._population_size])
 
         self.set_current_worst()
 
@@ -130,6 +133,7 @@ class Population():
 
 
     def evolution(self, nb_generation, img_template="output%d.png", checkpoint_path="output", rate=None, swap=None, sigma=None, color_rate=None):
+        global save
         if rate is not None:
             self.rate=rate
         if swap is not None:
