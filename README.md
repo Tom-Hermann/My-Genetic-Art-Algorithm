@@ -25,10 +25,15 @@ Results
 -------
 
 <!-- display assets/img.jpg :-->
-[![assets/img.jpg](assets/img.jpg)](assets/img.jpg)
-[![assets/drawing_00001.png](assets/drawing_00001.png)](assets/drawing_00001.png)
-[![assets/drawing_01000.png](assets/drawing_01000.png)](assets/drawing_01000.png)
-[![assets/drawing_02000.png](assets/drawing_02000.png)](assets/drawing_02000.png)
+
+
+<img src="assets/drawing_00001.png" alt="drawing" width="250"/>
+<img src="assets/drawing_01000.png" alt="drawing" width="250"/>
+<img src="assets/drawing_02000.png" alt="drawing" width="250"/>
+
+<center><img src="assets/img.jpg" alt="drawing" width="200"/></center>
+
+
 
 
 Note
