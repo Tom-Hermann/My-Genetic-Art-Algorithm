@@ -115,13 +115,16 @@ class Population():
         save = self._current_best.copy()
         new_induviduals = []
 
-        print(f'Generation {self.current_generation}:\n\tCreating new induviduals:\t', end='', flush=True)
+        if self.printable:
+            print(f'Generation {self.current_generation}:\n\tCreating new induviduals:\t', end='', flush=True)
         for _ in range(self._population_size):
             mom, dad = pick_best_and_random(self)
             child_a, child_b = Painting.get_child(mom, dad)
             new_induviduals.extend((child_a, child_b))
-            print('.', end='', flush=True)
-        print()
+            if self.printable:
+                print('.', end='', flush=True)
+        if self.printable:
+            print()
         new_induviduals.sort(key=lambda x: x.fiting)
         new_induviduals = new_induviduals[:self._population_size]
 
