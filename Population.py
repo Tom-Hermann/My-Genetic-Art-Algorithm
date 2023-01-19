@@ -7,27 +7,21 @@ import threading
 save = 0
 
 def pick_random(pop):
-    mom = random.choice(pop)
     dad = random.choice(pop)
-    return mom, dad
+    return dad
 
-
-def pick_best_and_random(pop: 'Population', maximize=False):
-    if evaluated_individuals := tuple(filter(lambda x: x.fiting is not None, pop)):
-        mom = max(evaluated_individuals, key=lambda x: x.fiting if maximize else -x.fiting)
-    else:
-        mom = random.choice(pop)
-    dad = random.choice(pop)
-    return mom, dad
+def pick_best(pop: 'Population', maximize=False):
+    mom = pop._current_best
+    return mom
 
 
 def print_summary(pop: 'Population', img_template="output%d.png", checkpoint_path="output") -> int:
 
     global save
 
-    avg_fitness = sum(i.fiting for i in pop.induviduals) / pop._population_size
 
     if pop.printable:
+        avg_fitness = sum(i.fiting for i in pop.induviduals) / pop._population_size
         print(f"\tBest score {pop._current_best.fiting}, pop. avg. {avg_fitness}")
     if (save != pop._current_best.fiting and pop.current_generation % pop.save_rate == 0):
         save = pop._current_best.fiting
@@ -46,9 +40,9 @@ class Population():
         self.induviduals: list[Painting] = []
         for _ in range(population_size):
             self.induviduals.append(Painting(nb_figures, target_img, background_color, nb_corner, printable=printable))
-            if self.printable:
+            if printable:
                 print('.', end='', flush=True)
-        if self.printable:
+        if printable:
             print()
         self.current_generation: int = generation
         self._current_best = None
@@ -90,16 +84,11 @@ class Population():
         return self._current_best
 
     def set_current_best(self, maximize=False):
-        if evaluated_individuals := tuple(filter(lambda x: x.fiting is not None, self.induviduals)):
-            self._current_best = max(evaluated_individuals, key=lambda x: x.fiting if maximize else -x.fiting)
-        else:
-            self._current_best = random.choice(self.induviduals)
+            self._current_best = max(self.induviduals, key=lambda x: x.fiting if maximize else -x.fiting)
 
     def set_current_worst(self, maximize=False):
-        if evaluated_individuals := tuple(filter(lambda x: x.fiting is not None, self.induviduals)):
-            self._current_wors = min(evaluated_individuals, key=lambda x: x.fiting if maximize else -x.fiting)
-        else:
-            self._current_wors = random.choice(self.induviduals)
+            self._current_wors = min(self.induviduals, key=lambda x: x.fiting if maximize else -x.fiting)
+
 
     def mutate_population(self, rate=0.04, swap=0.5, sigma=1, bg_color_rate=0.1):
         if self.printable:
@@ -115,20 +104,30 @@ class Population():
         save = self._current_best.copy()
         new_induviduals = []
 
+        # Create children
         if self.printable:
             print(f'Generation {self.current_generation}:\n\tCreating new induviduals:\t', end='', flush=True)
+        # Get the current best as mom
+        mom = pick_best(self)
         for _ in range(self._population_size):
-            mom, dad = pick_best_and_random(self)
-            child_a, child_b = Painting.get_child(mom, dad)
-            new_induviduals.extend((child_a, child_b))
+            # get random individu as dad
+            dad = pick_random(self)
+
+            # add to new_induviduals the two child
+            new_induviduals.extend(Painting.get_child(mom, dad))
             if self.printable:
                 print('.', end='', flush=True)
         if self.printable:
             print()
+
+        # sorted population by fiting
         new_induviduals.sort(key=lambda x: x.fiting)
+
+        # get the n best child (n == _population_size)
         new_induviduals = new_induviduals[:self._population_size]
 
-        self.induviduals = new_induviduals.copy()
+        self.induviduals = new_induviduals
+        # self.induviduals = new_induviduals.copy()
 
         self.mutate_population(rate=self.rate, swap=self.swap, sigma=self.sigma, bg_color_rate=self.bg_color_rate)
 
