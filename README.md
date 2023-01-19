@@ -30,7 +30,7 @@ Results
 <img src="assets/drawing_00001.png" alt="drawing" width="250"/><img src="assets/drawing_01000.png" alt="drawing" width="250"/><img src="assets/drawing_02000.png" alt="drawing" width="250"/>
 
 <p align="center">
-    <img src="assets/img.jpg" alt="drawing" width="200"/>
+    <img src="assets/img.jpg" alt="drawing" width="300"/>
 </p>
 
 
