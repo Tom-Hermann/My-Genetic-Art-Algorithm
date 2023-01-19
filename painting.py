@@ -6,7 +6,7 @@ from copy import deepcopy
 
 
 class Painting:
-    def __init__(self,nb_figures, target_img: Image, background_color=None, nb_corner=-1, set_figures:bool = True):
+    def __init__(self,nb_figures, target_img: Image, background_color=None, nb_corner=-1, set_figures:bool = True, printable:bool = True):
         self._target_img = target_img
         self._img_width, self._img_height = target_img.size
         self._nb_figures = nb_figures
@@ -23,6 +23,8 @@ class Painting:
         else:
             self.fiting = None
             self.figures = []
+
+        self.printable = printable
 
 
     def copy(self):
@@ -110,10 +112,10 @@ class Painting:
             self.figures[index].mutate(sigma=sigma)
 
 
-        # mutate background color
+        # new background color
         if random.random() < (color_rate/2):
             self._background_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255)
-
+        # mutate background color
         elif random.random() < (color_rate/2):
             def clamp(x):
                 return max(0, min(x, 255))
@@ -126,4 +128,5 @@ class Painting:
             self.figures[random_indices[0]], self.figures[random_indices[1]] = self.figures[random_indices[1]], self.figures[random_indices[0]]
 
         self.fiting = self.image_diff()
-        print('.', end='', flush=True)
+        if self.printable:
+            print('.', end='', flush=True)

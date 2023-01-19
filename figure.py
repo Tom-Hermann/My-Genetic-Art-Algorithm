@@ -107,14 +107,17 @@ class Circle(Figure):
 
     def mutate(self, sigma=1.0):
         mutations = ['move', 'color', 'reset']
-        weights = [30, 35, 30, 5]
+        weights = [45, 45, 10]
 
         mutation_type = random.choices(mutations, weights=weights, k=1)[0]
 
         if mutation_type == 'move': # move the whole triangle
-            x_shift = int(random.randint(-50, 50)*sigma)
-            y_shift = int(random.randint(-50, 50)*sigma)
-            self.points = [(x + x_shift, y + y_shift) for x, y in self.points]
+            x1_shift = int(random.randint(-50, 50)*sigma)
+            y1_shift = int(random.randint(-50, 50)*sigma)
+            x2_shift = int(random.randint(-50, 50)*sigma)
+            y2_shift = int(random.randint(-50, 50)*sigma)
+            x1, y1, x2, y2 = self.points
+            self.points = (x1 + x1_shift, y1 + y1_shift, x2 + x2_shift, y2 + y2_shift)
         elif mutation_type == 'color': # change color
             self.color = tuple(c + int(random.randint(-50, 50)*sigma) for c in self.color) # move color by random value
             self.color = tuple(min(max(c, 0), 255) for c in self.color) # clamp to 0-255
