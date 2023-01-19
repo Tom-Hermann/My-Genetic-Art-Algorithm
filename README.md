@@ -26,8 +26,7 @@ Results
 
 <!-- display assets/img.jpg :-->
 
-
-<img src="assets/drawing_00001.png" alt="drawing" width="250"/><img src="assets/drawing_01000.png" alt="drawing" width="250"/><img src="assets/drawing_02000.png" alt="drawing" width="250"/>
+<p align="left"><img src="assets/drawing_00001.png" alt="drawing" width="250"/></p><p align="center"><img src="assets/drawing_01000.png" alt="drawing" width="250"/></p><p align="right"><img src="assets/drawing_02000.png" alt="drawing" width="250"/></p>
 
 <p align="center">
     <img src="assets/img.jpg" alt="drawing" width="300"/>
