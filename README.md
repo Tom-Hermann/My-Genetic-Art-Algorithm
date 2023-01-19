@@ -26,13 +26,15 @@ Results
 
 <!-- display assets/img.jpg :-->
 
-<p align="center">
-<img src="assets/drawing_00001.png" alt="drawing" width="250"/> <img src="assets/drawing_01000.png" alt="drawing" width="250"/> <img src="assets/drawing_02000.png" alt="drawing" width="250"/>
-</p>
 
-<p align="center">
-    <img src="assets/img.jpg" alt="drawing" width="300"/>
-</p>
+|0|1000|2000|2978|
+|-|-|-|-|
+|<img src="assets/drawing_00001.png">|<img src="assets/drawing_01000.png">|<img src="assets/drawing_02000.png">|<img src="assets/drawing_02978.png"/>|
+
+
+|Original|2978 generation|
+|-|-|
+|<img src="assets/img.jpg"/>|<img src="assets/drawing_02978.png"/>
 
 
 
